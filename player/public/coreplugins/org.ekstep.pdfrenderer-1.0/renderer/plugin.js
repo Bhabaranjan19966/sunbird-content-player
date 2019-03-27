@@ -77,13 +77,9 @@ org.ekstep.contentrenderer.baseLauncher.extend({
         this.enableOverly();
     },
     renderPDF: function(path, canvasContainer) {
-        EkstepRendererAPI.dispatchEvent("renderer:splash:hide");
+        
         var pdfMainContainer = document.createElement("div");
         pdfMainContainer.id = "pdf-main-container";
-
-        var pdfLoader = document.createElement("div");
-        pdfLoader.id = "pdf-loader";
-        pdfLoader.textContent = "Loading document ...";
 
         var pdfNoPage = document.createElement("div");
         pdfNoPage.id = "pdf-no-page";
@@ -254,7 +250,6 @@ org.ekstep.contentrenderer.baseLauncher.extend({
             context.showPage(--context.CURRENT_PAGE);
     },
     showPDF: function(pdf_url) {
-        $("#pdf-loader").show(); // use rendere loader
         PDFJS.disableWorker = true;
         console.log("MANIFEST DATA", this.manifest)
 
@@ -265,18 +260,14 @@ org.ekstep.contentrenderer.baseLauncher.extend({
         }).then(function(pdf_doc) {
             context.PDF_DOC = pdf_doc;
             context.TOTAL_PAGES = context.PDF_DOC.numPages;
-
-            // Hide the pdf loader and show pdf container in HTML
-            $("#pdf-loader").hide();
+            EkstepRendererAPI.dispatchEvent("renderer:splash:hide");
             $("#pdf-contents").show();
             context.CANVAS.width = $('#pdf-contents').width();
             $("#pdf-total-pages").text(context.TOTAL_PAGES);
-
             // Show the first page
             context.showPage(1);
         }).catch(function(error) {
             // If error re-show the upload button
-            $("#pdf-loader").hide();
             $("#upload-button").show();
             error.message = "Missing PDF"
             context.throwError(error);
